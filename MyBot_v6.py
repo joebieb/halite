@@ -3,7 +3,7 @@ import logging
 from collections import OrderedDict
 
 # GAME START
-game = hlt.Game("Spoof_v7")
+game = hlt.Game("Spoof_v6")
 logging.info('Starting my %s bot!', game._name)
 TURN = 0
 
@@ -12,7 +12,7 @@ def navigate(ship, entity, multiplier = 1):
         ship.closest_point_to(entity),
         game_map,
         speed=int(hlt.constants.MAX_SPEED * multiplier),
-        ignore_ships=True)
+        ignore_ships=False)
     if navigate_command:
         command_queue.append(navigate_command)
 
@@ -21,15 +21,15 @@ def kamikazee(ship, entity):
         entity,
         game_map,
         speed=int(hlt.constants.MAX_SPEED),
-        ignore_ships=False)
+        ignore_ships=True)
     if navigate_command:
         command_queue.append(navigate_command)
 
 while True:
     # TURN START
     TURN += 1
-    group_attack_limit = 3
-    attack_ship_modifier = .4
+    group_attack_limit = 2
+    attack_ship_modifier = .6
 
     game_map = game.update_map()
     command_queue = []
@@ -78,7 +78,7 @@ while True:
     #logging.info(enemy_centroid)
     # find undocked ships that are closest to action and make them fighters first set the rest as miners
     attack_ships = my_ships_by_distance_to_enemy_centroid[0 : int(len(my_ships_by_distance_to_enemy_centroid) * attack_ship_modifier)]
-    # logging.info('Number of attack ships: %s', len(attack_ships))
+
     # For every ship that I control
     for ship in my_ships:
         # If the ship is docked
@@ -104,12 +104,12 @@ while True:
                 #         if ship.can_dock(target_unowned_planets[0]):
                 #             command_queue.append(ship.dock(target_unowned_planets[0]))
                 #     else:
-                #         navigate(ship, enemy_ship, 1)
+                #         navigate(ship, enemy_ship, .8)
                 # else:
-                    # if enemy is targeted by n ships then get next closest ship
+
+                # if enemy is targeted by n ships then get next closest ship
                 if enemy_ship in targeted_ships:
                     if targeted_ships.count(enemy_ship) >= group_attack_limit:
-                        # logging.info('group attack limit met, trying next ship')
                         continue
                 targeted_ships.append(enemy_ship)
                 navigate(ship, enemy_ship, 1)
